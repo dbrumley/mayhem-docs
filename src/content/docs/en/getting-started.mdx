@@ -11,11 +11,11 @@ hero:
   actions:
     - text: Get started
       icon: rocket
-      link: /en/install/auto/
+      link: /en/installation/
       variant: primary
     - text: Learn about Mayhem's features
       icon: right-arrow
-      link: /en/concepts/why-astro/
+      link: /en/concepts/why-mayhem/
   facepile:
     tagline: Powered by Mayhem
     linkText: Join us!
@@ -31,18 +31,22 @@ import Discord from '~/components/Landing/Discord.astro'
 <CardGrid>
 
   <SplitCard title="Take a guided tour" icon="rocket">
-    Complete our introductory How to Mayhem Tutorial to learn the basics of
-    building dynamic analysis into your CI/CD pipeline.
+    Complete our introductory [Build a Calculator](/en/tutorial/01) to learn the basics of
+    setting up an application with Mayhem integrated into CICD. 
   </SplitCard>
 
 
-  <Card title="What will you secure with Mayhem?" icon="laptop">
-    Card 1.
+  <Card title="Learn about Mayhem" icon="star">
+    Learn about [why Mayhem, fuzzing, and dynamic analysis](/en/concepts/why-mayhem) help security and
+    improve the reliability of your code. 
   </Card>
 
-  <Card title="Take a guided tour" icon="star">
-    Card 2.
+
+  <Card title="Install Mayhem" icon="laptop">
+    Our [installation guide](/en/installation) has step-by-step instructions for installing the
+    Mayhem CLI and dependencies like Docker. 
   </Card>
+
 
 
   <ListCard title="Learn" icon="open-book">
