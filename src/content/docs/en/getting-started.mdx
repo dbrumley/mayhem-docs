@@ -1,0 +1,62 @@
+---
+title: Getting Started
+description: A basic intro to Mayhem.
+i18nReady: false
+tableOfContents: false
+editUrl: false
+next: false
+hero:
+  title: Mayhem Docs
+  tagline: Guides, resources, and references to help you secure your apps with Mayhem.
+  actions:
+    - text: Get started
+      icon: rocket
+      link: /en/install/auto/
+      variant: primary
+    - text: Learn about Mayhem's features
+      icon: right-arrow
+      link: /en/concepts/why-astro/
+  facepile:
+    tagline: Powered by Mayhem
+    linkText: Join us!
+    link: /en/contribute/
+---
+
+import { CardGrid } from '@astrojs/starlight/components'
+import Card from '~/components/Landing/Card.astro'
+import ListCard from '~/components/Landing/ListCard.astro'
+import SplitCard from '~/components/Landing/SplitCard.astro'
+import Discord from '~/components/Landing/Discord.astro'
+
+<CardGrid>
+
+  <SplitCard title="Take a guided tour" icon="rocket">
+    Complete our introductory How to Mayhem Tutorial to learn the basics of
+    building dynamic analysis into your CI/CD pipeline.
+  </SplitCard>
+
+
+  <Card title="What will you secure with Mayhem?" icon="laptop">
+    Card 1.
+  </Card>
+
+  <Card title="Take a guided tour" icon="star">
+    Card 2.
+  </Card>
+
+
+  <ListCard title="Learn" icon="open-book">
+    - Main features
+    - Architecture
+    - Components
+    - Mayhemfiles
+  </ListCard>
+
+  <ListCard title="Examples" icon="puzzle">
+    - lighttpd
+    - ntp
+    - and so on
+  </ListCard>
+</CardGrid>
+
+<Discord title="Have a question or want to get involved?" cta="Join our Discord"/>
