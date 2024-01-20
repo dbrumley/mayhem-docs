@@ -48,6 +48,10 @@ export var sidebar = [
     label: 'Reference', collapsed: true,
     autogenerate: { directory: 'reference', collapsed: true }
   },
+  {
+    label: 'Support', link: 'support/support'
+  },
+
 ];
 
 /*  { text: 'Installation', slug: 'installation', key: 'install' },

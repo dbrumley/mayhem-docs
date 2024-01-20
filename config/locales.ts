@@ -1,6 +1,5 @@
 import type starlight from '@astrojs/starlight';
-//import { normalizeLangTag } from '../src/i18n/bcp-normalize';
-//import languages, { rtlLanguages } from '../src/i18n/languages';
+
 
 export var locales = {
   en: {
