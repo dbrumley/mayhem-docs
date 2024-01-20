@@ -1,19 +1,33 @@
 ---
-title: メイヘムへようこそ
-description: Get started building your docs site with Starlight.
+title: メイヘム 🤖 コードの安全性を確保するメイヘムコード
+description: メイヘムは、安全で信頼性の高いアプリケーションの構築を支援します。
 template: splash
 hero:
-  tagline: 正確で実行可能な結果のためのアプリケーションセキュリティプラットフォーム.
+  tagline: 正確で実用的な結果。
   image:
-    file: ../../../assets/houston.webp
+    file: ~/assets/houston.webp
   actions:
-    - text: Get started
-      link: /ja/getting-started/
+    - text: 始めましょう
+      link: /getting-started/
       icon: right-arrow
       variant: primary
-    - text: Read the docs
-      link: /ja/
-      icon: external
-
 ---
-Not completed. Will fall back to english.
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 次のステップ
+
+<CardGrid stagger>
+	<Card title="メイヘム分析を実行" icon="鉛筆">
+		このページを変更するには、`src/content/docs/index.mdx`を編集します。
+	</Card>
+	<Card title="CICDに統合" icon="ドキュメント追加">
+		新しいページを作成するために、MarkdownまたはMDXファイルを`src/content/docs`に追加します。
+	</Card>
+	<Card title="バグを修正" icon="設定">
+		`sidebar`やその他の設定を`astro.config.mjs`で編集します。
+	</Card>
+	<Card title="コードカバレッジを拡大" icon="開いた本">
+		[スターライトドキュメント](https://starlight.astro.build/)でさらに学びましょう。
+	</Card>
+</CardGrid>
