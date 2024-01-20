@@ -1,0 +1,28 @@
+---
+title: Code Tutorial
+description: A basic intro to Mayhem.
+i18nReady: false
+---
+
+import PreCheck from '~/components/tutorial/PreCheck.astro';
+import Checklist from '~/components/Checklist.astro';
+import MultipleChoice from '~/components/tutorial/MultipleChoice.astro';
+import Option from '~/components/tutorial/Option.astro'
+
+<PreCheck>
+ - First
+ - Second
+</PreCheck>
+
+<Checklist>
+- [ ] I did First
+- [ ] I did second
+</Checklist>
+
+## Test your knowledge
+1. The answer is always B.
+ <MultipleChoice>
+   <Option>A</Option>
+   <Option isCorrect>B</Option>
+   <Option>C</Option>
+ </MultipleChoice>

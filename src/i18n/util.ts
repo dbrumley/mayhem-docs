@@ -1,7 +1,6 @@
 import type { AstroGlobal } from 'astro';
 import { getLanguageFromURL } from '../util';
 import type {
-  NavDict,
   UIDict,
   UIDictionaryKeys,
   UILanguageKeys,
@@ -19,10 +18,6 @@ function mapDefaultExports<T>(modules: Record<string, { default: T }>) {
 
 export const translations = mapDefaultExports<UIDict>(
   import.meta.glob('./*/ui.ts', { eager: true })
-);
-
-export const navTranslations = mapDefaultExports<NavDict>(
-  import.meta.glob('./*/nav.ts', { eager: true })
 );
 
 export const fallbackLang = 'en';

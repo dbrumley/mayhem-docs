@@ -1,14 +1,15 @@
 import type starlight from '@astrojs/starlight';
-import { normalizeLangTag } from '../src/i18n/bcp-normalize';
-import languages, { rtlLanguages } from '../src/i18n/languages';
+//import { normalizeLangTag } from '../src/i18n/bcp-normalize';
+//import languages, { rtlLanguages } from '../src/i18n/languages';
 
-type StarlightLocalesConfig = NonNullable<Parameters<typeof starlight>[0]['locales']>;
-
-export function makeLocalesConfig(): StarlightLocalesConfig {
-  return Object.fromEntries(
-    Object.entries(languages).map(([locale, label]) => [
-      locale,
-      { label, lang: normalizeLangTag(locale), dir: rtlLanguages.has(locale) ? 'rtl' : 'ltr' },
-    ])
-  );
+export var locales = {
+  en: {
+    label: 'English',
+    dir: 'ltr'
+  },
+  'ja': {
+    label: '日本語',
+    lang: 'ja',
+    dir: 'ltr'
+  },
 }

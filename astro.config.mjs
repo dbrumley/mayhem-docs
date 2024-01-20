@@ -1,7 +1,9 @@
 import { defineConfig, sharpImageService } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { makeLocalesConfig } from './config/locales';
-import { makeSidebar } from './config/sidebar';
+import { locales } from './config/locales';
+import { sidebar } from './config/sidebar';
+
+//import { makeSidebar } from './config/sidebar';
 
 // https://astro.build/config
 export default defineConfig({
@@ -9,8 +11,8 @@ export default defineConfig({
 		starlight({
 			title: 'Docs',
 			defaultLocale: 'en',
-			locales: makeLocalesConfig(),
-			sidebar: makeSidebar(),
+			locales: locales,
+			sidebar: sidebar,
 			social: {
 				github: 'https://github.com/forallsecure',
 			},
