@@ -8,6 +8,7 @@ import { sidebar } from './config/sidebar';
 import rehypeSlug from 'rehype-slug';
 import remarkSmartypants from 'remark-smartypants';
 
+import { sitemap } from './integrations/sitemap';
 import { rehypeAutolink } from './plugins/rehype-autolink';
 import { rehypeOptimizeStatic } from './plugins/rehype-optimize-static';
 import { rehypeTasklistEnhancer } from './plugins/rehype-tasklist-enhancer';
@@ -39,8 +40,11 @@ export default defineConfig({
       sidebar: sidebar,
       social: {
         github: 'https://github.com/forallsecure/',
+        linkedin: 'https://www.linkedin.com/company/forallsecure-inc',
+        twitter: 'https://twitter.com/ForAllSecure'
       },
     }),
+    sitemap(),
   ],
   trailingSlash: 'always',
   scopedStyleStrategy: 'where',
