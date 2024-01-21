@@ -1,0 +1,155 @@
+---
+type: tutorial
+order: 2
+unitTitle: Setup the code base
+title: 'Setup the code base'
+description: >-
+  Tutorial: Analyzing libraries
+
+  Install your development environment, and build the initial library.
+i18nReady: true
+---
+
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro'
+import PreCheck from '~/components/tutorial/PreCheck.astro';
+
+<PreCheck>
+ - Fork the initial tinyxml2 GitHub repository.
+ - Clone your copy to your local machine.
+ - Build the code.
+ - Run the included test driver. 
+</PreCheck>
+
+<Lede>Let's get started improving tinyxml2-2.0.1!</Lede>
+
+Now that you know what we're going to improve and have all the dependencies
+installed, it's time to make sure you can build the software. 
+
+:::tip[Always check you can compile first]
+The first thing  you should always do when adding any new analysis is make sure
+you know how to build the software. It can take some time when working
+with a new code base, so be patient with yourself.  
+:::
+
+## Fork the initial repository
+
+As you write code, you will be periodically committing your changes to
+GitHub, and ultimately setting up your CI/CD pipeline to automatically run a
+security analysis pipeline. A fork in Git is simply a copy of an existing
+repository in which your changes are your own and disconnected from the
+original developers.  
+
+Your first step is to fork our [sample
+repository](https://github.com/ForAllSecure/analyze-libraries-tutorial) on
+GitHub.  You should be able to see your fork at
+**https://github.com/USERNAME/analyze-libraries-tutorial** (using your own
+USERNAME) when complete. 
+
+## Clone your repository
+
+Once you've created a fork, you need to download it to your local machine.
+This is called "cloning" the repository. To do so, run:
+
+```bash
+# Clone the repository. Make sure you use your own USERNAME
+git@github.com:<USERNAME>/analyze-libraries-tutorial.git 
+
+# Enter the code directory
+cd analyze-libraries-tutorial 
+```
+
+## Build the code
+
+From now on we will assume you are in the tutorial code directory
+`analyze-libraries-tutorial`.  Our first major step is to make sure you can
+build the code.  
+
+```bash
+cmake -B build   # Create a build directory with source in the current directory
+make -C build         # Enter the build directory and run make
+```
+
+<details>
+<summary>I tried building with `make` and it failed. Help!</summary>
+
+There are two common problems.
+
+1. You don't have a C++ compiler installed. If you are on Linux, you will need
+   to install the appropriate package, such as `build-essential` on Debian and
+   Ubuntu.
+2. You ran `make` from the project root directory. You run `cmake` in the project root
+   directory, but then switch to the **build** directory to run `make`. 
+
+The default `Makefile` may not work for you, and that's why we are
+using the `cmake` process.
+</details>
+
+
+:::tip[What compile commands ran?]
+
+You can set up `make` to show you each command it executed to build the source
+by adding `VERBOSE=` to your command line:
+```bash 
+cmake -B build
+make -C build VERBOSE=1
+```
+
+<details>
+<summary>Want to set verbose as the default option?</summary>
+You can add `-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON` to make this permanent for the
+`make` command:
+```bash
+cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -S . -B build
+make
+```
+</details>
+
+<details>
+<summary>What something machine-parsable?</summary>  
+You can create a `compile_commands.json` file
+with: 
+```bash
+cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 # 
+make -C build 
+```
+`compile_commands.json` can be read by downstream tools like [CodeCompass](https://github.com/Ericsson/CodeCompass). 
+</details>
+:::
+
+## Run a test
+The source code includes a test application called `test`.  Let's make sure it
+runs!
+
+```bash
+# From the `build` directory, run ./test
+./test
+[pass] Example-1 [0][0]
+[pass] Example-2 [0][0]
+Name of play (1): A Midsummer Night's Dream
+Name of play (2): A Midsummer Night's Dream
+[pass] Example-3 [0][0]
+Both values are the same: 2 and 2
+[pass] Example-4 [1][1]
+<element/>
+...
+```
+Great job! Making sure you can build the application is often over half the job
+when retrofitting application security into a legacy or existing project.
+
+
+
+
+
+<Box icon="check-list">
+## Checklist
+
+<Checklist>
+- [ ] I've created my own fork
+- [ ] I've cloned the fork to my local machine
+- [ ] I've successfully built the code
+- [ ] I've ran `./test` successfully
+</Checklist>
+</Box>
+

@@ -1,5 +1,4 @@
 import type docsearch from '@docsearch/js';
-import enNav from './en/nav';
 import type enUI from './en/ui';
 import type { allLanguages } from './languages';
 
@@ -11,7 +10,6 @@ export type UILanguageKeys = keyof typeof allLanguages;
 
 /** Helper to type check a dictionary of UI string translations. */
 export const UIDictionary = (dict: Partial<typeof enUI>) => dict;
-
 
 export interface DocSearchTranslation {
   // These two keys are Astro-specific and apply to the search box in the header.

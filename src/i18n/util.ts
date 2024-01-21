@@ -1,10 +1,6 @@
 import type { AstroGlobal } from 'astro';
 import { getLanguageFromURL } from '../util';
-import type {
-  UIDict,
-  UIDictionaryKeys,
-  UILanguageKeys,
-} from './translation-checkers';
+import type { UIDict, UIDictionaryKeys, UILanguageKeys } from './translation-checkers';
 
 function mapDefaultExports<T>(modules: Record<string, { default: T }>) {
   const exportMap: Record<string, T> = {};
@@ -14,7 +10,6 @@ function mapDefaultExports<T>(modules: Record<string, { default: T }>) {
   }
   return exportMap;
 }
-
 
 export const translations = mapDefaultExports<UIDict>(
   import.meta.glob('./*/ui.ts', { eager: true })

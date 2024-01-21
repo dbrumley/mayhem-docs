@@ -2,56 +2,78 @@ export var sidebar = [
   {
     label: 'Start Here',
     translations: {
-      'ja': 'ここから始める',
+      ja: 'ここから始める',
     },
     items: [
       { label: 'Getting Started', slug: 'getting-started', link: '/getting-started' },
       { label: 'Installation', slug: 'installation', link: '/installation' },
-      { label: 'Build a calculator', link: 'tutorial/code-tutorial', badge: { text: 'Code', variant: 'tip' } },
-      { label: 'Build an API', link: 'tutorial/api-tutorial', badge: { text: 'API', variant: 'tip' } },
-    ]
+      {
+        label: 'Build a secure calculator app',
+        link: 'tutorial/code-tutorial/',
+        badge: { text: 'Code', variant: 'tip' },
+      },
+      {
+        label: 'Build a secure API',
+        link: 'tutorial/api-tutorial',
+        badge: { text: 'API', variant: 'tip' },
+      },
+    ],
   },
   {
-    label: 'Tutorials', collapsed: true,
+    label: 'Tutorials',
+    collapsed: true,
     items: [
-      { label: 'Harnessing Binaries', link: 'tutorial/harness-binary', },
-      { label: 'Harnessing Libraries', link: 'tutorial/harness-libraries', },
-    ]
+      {
+        label: 'Analyze Source',
+        autogenerate: { directory: 'tutorials/analyze-source' },
+        collapsed: true,
+      },
+      {
+        label: 'Analyze Libraries',
+        autogenerate: { directory: 'tutorials/analyze-libraries/' },
+        collapsed: true,
+      },
+      { label: 'Analyze Binaries', link: 'tutorials/analyze-binary', collapsed: true },
+    ],
   },
   {
-    label: 'Core Concepts', collapsed: true,
+    label: 'Core Concepts',
+    collapsed: true,
     items: [
       { label: 'Using Mayhem', slug: 'using-mayhem', link: '/concepts/using-mayhem' },
       { label: 'How Mayhem Works', slug: 'how-mayhem-works', link: '/concepts/how-mayhem-works' },
       { label: 'Design Rationale', slug: 'design-rationale', link: '/concepts/design-rationale' },
       { label: 'Integration', slug: 'integration', link: '/concepts/integration' },
-
-    ]
+    ],
   },
   {
-    label: 'Analyze', collapsed: true,
+    label: 'Analyze',
+    collapsed: true,
     items: [
       { label: 'Code & Binaries', link: 'analyze/code' },
-      { label: 'APIs', link: 'analyze/api', },
-      { label: 'Runtime SBOM', link: 'analyze/sbom', },
-    ]
+      { label: 'APIs', link: 'analyze/api' },
+      { label: 'Runtime SBOM', link: 'analyze/sbom' },
+    ],
   },
   {
-    label: 'Recipes', collapsed: true,
-    autogenerate: { directory: 'recipes', collapsed: true }
+    label: 'Recipes',
+    collapsed: true,
+    autogenerate: { directory: 'recipes', collapsed: true },
   },
   {
-    label: 'Managing Mayhem', collapsed: true,
-    autogenerate: { directory: 'managing', collapsed: true }
+    label: 'Managing Mayhem',
+    collapsed: true,
+    autogenerate: { directory: 'managing', collapsed: true },
   },
   {
-    label: 'Reference', collapsed: true,
-    autogenerate: { directory: 'reference', collapsed: true }
+    label: 'Reference',
+    collapsed: true,
+    autogenerate: { directory: 'reference', collapsed: true },
   },
   {
-    label: 'Support', link: 'support/support'
+    label: 'Support',
+    link: 'support/support',
   },
-
 ];
 
 /*  { text: 'Installation', slug: 'installation', key: 'install' },

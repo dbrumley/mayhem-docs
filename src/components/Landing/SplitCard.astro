@@ -1,5 +1,5 @@
 ---
-import { Card } from "@astrojs/starlight/components";
+import { Card } from '@astrojs/starlight/components';
 
 export type Props = Parameters<typeof Card>[0];
 ---
@@ -17,7 +17,7 @@ export type Props = Parameters<typeof Card>[0];
     --card-bg: rgba(23, 25, 30, 0.8);
     grid-column: 1 / -1;
   }
-  :global(:root[data-theme="light"]) .card--fullwidth {
+  :global(:root[data-theme='light']) .card--fullwidth {
     --card-bg: rgba(255, 255, 255, 0.8);
   }
 
@@ -31,8 +31,7 @@ export type Props = Parameters<typeof Card>[0];
 
   .card--fullwidth :global(.card) {
     background:
-      radial-gradient(var(--sl-color-orange-low), transparent 70%) no-repeat 50% -25% /
-        120% 300%,
+      radial-gradient(var(--sl-color-orange-low), transparent 70%) no-repeat 50% -25% / 120% 300%,
       var(--card-bg);
     position: relative;
   }

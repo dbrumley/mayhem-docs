@@ -1,39 +1,36 @@
 ---
-import { Icon } from "@astrojs/starlight/components";
-import { z } from "astro/zod";
-type IconName = Parameters<typeof Icon>[0]["name"];
+import { Icon } from '@astrojs/starlight/components';
+import { z } from 'astro/zod';
+type IconName = Parameters<typeof Icon>[0]['name'];
 
 interface Props {
-  variant: "primary" | "secondary" | "minimal";
+  variant: 'primary' | 'secondary' | 'minimal';
   link: string;
-  icon?:
-    | undefined
-    | { type: "icon"; name: IconName }
-    | { type: "raw"; html: string };
+  icon?: undefined | { type: 'icon'; name: IconName } | { type: 'raw'; html: string };
 }
 
 const propsSchema = z.object({
-  variant: z.enum(["primary", "secondary", "minimal"]).default("primary"),
+  variant: z.enum(['primary', 'secondary', 'minimal']).default('primary'),
   link: z.string(),
   icon: z
     .union([
       z.object({
-        type: z.literal("icon"),
+        type: z.literal('icon'),
         name: z.custom<IconName>(z.string().parse),
       }),
-      z.object({ type: z.literal("raw"), html: z.string() }),
+      z.object({ type: z.literal('raw'), html: z.string() }),
     ])
     .optional(),
 });
 
 // TODO: Remove once all content has been updated to use the correct props.
-if (Astro.props.variant === ("outline" as any)) {
+if (Astro.props.variant === ('outline' as any)) {
   console.warn(`
 <Button variant="outline"> is deprecated.
 Please use <Button variant="secondary"> instead.`);
-  Astro.props.variant = "secondary";
+  Astro.props.variant = 'secondary';
 }
-if ("href" in Astro.props && typeof Astro.props.href === "string") {
+if ('href' in Astro.props && typeof Astro.props.href === 'string') {
   console.warn(`
 <Button href="..."> is deprecated.
 Please use <Button link="..."> instead.`);
@@ -42,10 +39,10 @@ Please use <Button link="..."> instead.`);
 const { link, variant, icon } = propsSchema.parse(Astro.props);
 ---
 
-<a class:list={["sl-flex action", variant]} href={link}>
+<a class:list={['sl-flex action', variant]} href={link}>
   <slot />
-  {icon?.type === "icon" && <Icon name={icon.name} size="1.5em" />}
-  {icon?.type === "raw" && <Fragment set:html={icon.html} />}
+  {icon?.type === 'icon' && <Icon name={icon.name} size="1.5em" />}
+  {icon?.type === 'raw' && <Fragment set:html={icon.html} />}
 </a>
 
 <style>

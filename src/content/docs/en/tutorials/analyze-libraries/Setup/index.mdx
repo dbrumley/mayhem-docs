@@ -1,0 +1,89 @@
+---
+type: tutorial
+order: 1
+unitTitle: Setup the your environment. 
+title: 'Setup your environment'
+description: >-
+  Tutorial: Analyzing libraries
+
+  Prepare your development environment, and build the initial library.
+i18nReady: true
+---
+
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro'
+import PreCheck from '~/components/tutorial/PreCheck.astro';
+
+<PreCheck>
+ - Install the tools that you need to build tinyxml2. 
+</PreCheck>
+
+<Lede>Let's make sure your system is set up.</Lede>
+
+## Get the developer tools you need
+
+### Terminal
+
+You will use a **command line (terminal)** to build and modify tinyxml2. 
+
+You can access the command line through a local terminal program for your
+operating system. Common applications include **Terminal** (MacOS/Linux) and
+the **Command Prompt** (Windows). One of these will
+probably already be on your machine.  
+
+If you are using Windows, we recommend you use [WSL to install Linux](https://learn.microsoft.com/en-us/windows/wsl/install) unless you
+are already very familiar with C++ development on Windows. That will allow you
+to follow along with the Linux tutorial on your windows machine. 
+
+
+### C++ compiler
+
+For tinyxml2 to build, you will also need to have a C++ compiler installed on
+your system.  In particular, we recommend that you install clang because it has
+additional optimizations that speed up dynamic analysis.
+
+You will also need to install `cmake`, which is used as the tinyxml software
+build tool. 
+
+On Debian and Ubuntu systems, you can install these requirements with:
+```bash
+sudo apt-get install -y build-essential clang cmake
+```
+
+### Code Editor
+
+Additionally, you will need to download and install a **code editor** to write
+your code.
+
+:::tip[We'll use...]
+This tutorial will use **VS Code**, but you can use any editor for your
+operating system.  For example, if you are use to `vim` make sure you have it
+installed with `sudo apt-get install -y vim`.
+:::
+
+### Git
+
+As you write code, you will be periodically committing your changes to
+GitHub, and ultimately setting up your CI/CD pipeline to automatically run a
+security analysis pipeline.
+
+We will be using `git` as part of this tutorial. Make sure you have it
+installed on your system. 
+
+On Linux, run:
+```bash
+sudo apt-get install -y git
+```
+
+
+<Box icon='check-list'>
+## Checklist 
+<Checklist>
+- [ ] I have access to the command line in a terminal.
+- [ ] I have installed a C++ compiler, preferably including clang.
+- [ ] I have a code editor like VS Code or vim installed.
+- [ ] I have git installed. 
+</Checklist>
+</Box>
+

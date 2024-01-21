@@ -1,5 +1,5 @@
 ---
-import { Card as StarlightCard } from "@astrojs/starlight/components";
+import { Card as StarlightCard } from '@astrojs/starlight/components';
 export type Props = Parameters<typeof StarlightCard>[0];
 ---
 
@@ -13,7 +13,7 @@ export type Props = Parameters<typeof StarlightCard>[0];
     display: contents;
     color: var(--sl-color-white);
   }
-  :global(:root[data-theme="light"]) .landing-card {
+  :global(:root[data-theme='light']) .landing-card {
     --card-bg: rgba(255, 255, 255, 0.8);
   }
 
@@ -27,7 +27,7 @@ export type Props = Parameters<typeof StarlightCard>[0];
     z-index: 1;
   }
   .landing-card :global(.card::before) {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     inset-inline-end: 0;

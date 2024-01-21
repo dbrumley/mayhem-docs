@@ -1,5 +1,5 @@
 ---
-import Card from "./Card.astro";
+import Card from './Card.astro';
 export type Props = Parameters<typeof Card>[0];
 ---
 
@@ -34,7 +34,7 @@ export type Props = Parameters<typeof Card>[0];
 
   /* Add arrow icon to links. */
   .link-list :global(a::after) {
-    content: "";
+    content: '';
     background-color: currentColor;
     width: 1rem;
     height: 1rem;
@@ -45,9 +45,7 @@ export type Props = Parameters<typeof Card>[0];
     -webkit-mask-size: 100%;
   }
   /* Mirror arrow in RTL layouts */
-  :global([dir="rtl"])
-    .link-list
-    :global(a::after:not(:where([dir="rtl"] [dir="ltr"] *))) {
+  :global([dir='rtl']) .link-list :global(a::after:not(:where([dir='rtl'] [dir='ltr'] *))) {
     transform: matrix(-1, 0, 0, 1, 0, 0);
   }
 </style>

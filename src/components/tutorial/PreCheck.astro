@@ -1,6 +1,6 @@
 ---
-import { useTranslations } from "../../i18n/util";
-import { Icon } from "@astrojs/starlight/components";
+import { useTranslations } from '../../i18n/util';
+import { Icon } from '@astrojs/starlight/components';
 
 const t = useTranslations(Astro);
 ---
@@ -10,7 +10,7 @@ const t = useTranslations(Astro);
     <span class="icon" aria-hidden="true">
       <Icon name="approve-check-circle" />
     </span>
-    {t("tutorial.getReady")}
+    {t('tutorial.getReady')}
   </p>
   <slot />
 </div>

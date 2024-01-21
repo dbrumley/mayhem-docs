@@ -1,0 +1,106 @@
+---
+type: tutorial
+title: What you will learn
+order: 1
+description: >-
+  Tutorial: Analyzing libraries
+
+  What you'll need to get started
+
+i18nReady: false
+---
+import Badge from '~/components/Badge.astro';
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro';
+
+<Lede> If you have a basic understanding with **C** and the **UNIX CLI**, you are
+ready to go. </Lede>
+
+You will also need a [GitHub](https://github.com) (or similar) account for
+integrating your project into CICD. 
+
+
+The steps we will be going through are:
+1. Create a git project for the library and your modifications
+2. Verify you can build the library
+3. Identify what functions to harness
+4. Create and build harnesses for the identified functions
+5. Dockerize the library with your harnesses
+6. Create an initial *seed* test suite corpus
+7. Write a Mayhemfile
+8. Analyze the library with Mayhem
+9. Reproduce Mayhem findings on your local machine
+10. Integrate the library and your harness into CI/CD
+
+
+<details>
+<summary>What is a harness? Why do I have to write them?</summary>
+
+Your code often relies on third-party libraries, but they are not stand-alone
+applications. In order to use an application library, you need to write code
+that:
+1. Initializes the library
+2. Calls functions you want to test
+3. Performs any necessary teardown
+
+The above steps are exactly what you would write to perform any software
+testing or dynamic analysis. Performing these steps is commonly called "harnessing" in security. 
+Libraries are not stand-alone applications. 
+
+</details>
+
+<details>
+<summary>Can I start with existing unit tests?</summary>
+
+Absolutely!  Unit tests are a great place to start.
+
+Mayhem and the underlying technologies such as fuzzing and symbolic execution
+are a generalization of testing.  A typical unit test takes exactly one input
+and tests for one output. You test for multiple inputs by writing multiple
+tests.
+
+For example, if we have the factorial function we might write three unit tests
+by hand: 
+```c
+EXPECT_EQ(Factorial(1), 1);
+EXPECT_EQ(Factorial(2), 2);
+EXPECT_EQ(Factorial(3), 6);
+```
+
+Mayhem generalizes unit testing by checking
+[program properties](https://en.wikipedia.org/wiki/Property_testing).  Without
+any configuration, Mayhem checks for runtime errors that raise signals, such as
+divide by zero and `assert` failures.
+
+One of the cool things about dynamic analysis is you can inline your own
+security property in the same language the program is written in. This is
+important because it allows you to co-develop what security you want with your
+application.  Tools that use a separate DSL (domain specific language) put the
+security requirements outside the code, which is more fragile and error prone.
+
+</details>
+
+<details>
+<summary>What sort of security properties can Mayhem check?</summary>
+
+Mayhem performs dynamic analysis, and can check any **enforceable security
+property**.  This set of properties is very general, and is [very precisely
+defined](https://www.cs.cornell.edu/fbs/publications/EnfSecPols.pdf). At a high
+level, any property that can be checked at execution time is an enforceable
+security property.
+
+
+</details>
+
+
+## Checklist for moving on
+
+<Box icon="check-list">
+## Checklist
+
+<Checklist>
+- [ ] I'm ready to build this thing!
+</Checklist>
+</Box>
+
