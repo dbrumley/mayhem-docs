@@ -1,0 +1,71 @@
+---
+type: tutorial
+title: ntpq example
+order: 3
+description: Learn how to check compiled libraries with Mayhem
+i18nReady: false
+---
+import Badge from '~/components/Badge.astro';
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro';
+
+<Lede> Let's harness ntpq, a popular XML library.  </Lede>
+
+In this example, you'll harness
+[ntp-4.2.2](https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.2.tar.gz)
+and reproduce CVE-2009-0159.
+
+
+There are three main steps for harnessing any library or application:
+1. Identify what functions to harness
+2. Create and build harnesses for library functions
+3. Create an initial test suite corpus
+
+Creating and building the harness is the same as writing a new test.  It
+involves:
+1. Create a driver that reads input from a file
+2. Write any initialization or setup code
+3. Call the function(s) under test
+4. Create mocks real objects that you cannot use (or do not want to use)
+5. Perform any necessary teardown, such as freeing memory.
+
+You will be writing a harness that finds CVE-2015-8317. 
+
+## Check out and build the code
+
+Download the code directly from
+[https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.2.tar.gz](https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.2.tar.gz).
+.  
+
+Then build just the `ntpq` directory:
+```bash
+make -C ntpq
+```
+
+## Hints
+
+<details>
+<summary>Compile with `afl-clang-fast`</summary>
+You can compile the program by setting `CC` (the compiler variable) with:
+```bash
+CC=afl-clang-fast ./configure && AFL_HARDEN=1 make -C ntpq
+```
+</details>
+<details>
+<summary>Figure out how to call the `cookedprint` function</summary>
+</details>
+
+<details> 
+<summary>Hint 2: Use existing code as your harness template</summary>
+Rather than trying to have afl's output simulate a remote ntpd, just replace
+`ntpq/ntpq.c:main()` function with code that calls `cookedprint` with `datatype`,
+`status`, and `data` all read in from stdin, and the output file as stdout.
+</details>
+
+## Credits
+
+This example comes from the wonderful [AFL training
+tutorial](https://github.com/mykter).  
+
+Have your own examples? We'd love for you to submit it as a PR!

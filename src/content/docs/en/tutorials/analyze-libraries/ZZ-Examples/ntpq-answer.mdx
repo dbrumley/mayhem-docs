@@ -1,0 +1,107 @@
+---
+type: tutorial
+title: ntpq answer
+order: 4
+description: Learn how to check compiled libraries with Mayhem
+i18nReady: false
+---
+import Badge from '~/components/Badge.astro';
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro';
+
+<Lede> Were you able to create a `ntpq` harness and find the vulnerability? </Lede>
+
+## Solution
+<details>
+<summary>Solution</summary>
+
+```
+#ifdef __AFL_HAVE_MANUAL_CONTROL
+        __AFL_INIT();
+#endif
+        int datatype=0;
+        int status=0;
+        char data[1024*16] = {0};
+        int length=0;
+#ifdef __AFL_HAVE_MANUAL_CONTROL
+        while (__AFL_LOOP(1000)) {
+#endif
+                datatype=0;
+                status=0;
+                memset(data,0,1024*16);
+                read(0, &datatype, 1);
+                read(0, &status, 1);
+                length = read(0, data, 1024 * 16);
+                cookedprint(datatype, length, data, status, stdout);
+#ifdef __AFL_HAVE_MANUAL_CONTROL
+        }
+#endif
+        return 0;
+```
+</details>
+
+<details>
+<answer>Improving stability</answer>
+If you fuzzed with the default harness above, you'll notice that the stability percentage is low. This can significantly by resetting the static variables `name` and `value`.
+
+To do so, add these lines to the start of `nextvar`:
+```c
+memset(name, 0, sizeof(name));
+memset(value, 0, sizeof(value));
+```
+
+</details>
+
+<details>
+<summary>Improving performance with a dictionary</summary>
+
+Hopefully you identified the function `varfmt` as interesting, which is
+checking strings against entries in the array `cookedvars`.   These can easily
+be extracted into a dictionary. In addition, you can grab `tstflagnames` too.
+
+
+The dictionary looks like:
+```
+// ntpq.dict
+"leap"
+"reach"
+"refid"
+"reftime"
+"clock"
+"org"
+"rec"
+"xmt"
+"flash"
+"srcadr"
+"peeradr"
+"dstadr"
+"filtdelay"
+"filtoffset"
+"filtdisp"
+"filterror"
+"pkt_dup"
+"pkt_bogus"
+"pkt_unsync"
+"pkt_denied"
+"pkt_auth"
+"pkt_stratum"
+"pkt_header"
+"pkt_autokey"
+"pkt_crypto"
+"peer_stratum"
+"peer_dist"
+"peer_loop"
+"peer_unreach"
+```
+
+
+
+
+</details>
+## Credits
+
+This example comes from the wonderful [AFL training
+tutorial](https://github.com/mykter).  
+
+Have your own examples? We'd love for you to submit it as a PR!
