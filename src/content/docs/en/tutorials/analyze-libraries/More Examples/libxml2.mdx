@@ -50,7 +50,7 @@ git checkout 726f67e  # Code at this point contains CVE-2015-8317
 
 Second, build the code with AFL by setting the `CC` environment variable to
 `afl-clang-fast`, a wrapper for the clang compiler. We'll also be telling the
-wrapper to build [ASAN instrumentation](/en/concepts/sanitizers). 
+wrapper to build [ASAN instrumentation](/en/concepts/security-policies). 
 
 ```bash
 CC=afl-clang-fast ./autogen.sh   # Use afl-clang-fast as the compiler
@@ -129,7 +129,7 @@ TBD
 ## Reproduce Mayhem findings locally
 TBD
 
-## Integrate your harnesses into CI/CD
+## Integrate your harnesses into CICD
 TBD
 
 ## Optimize performance
