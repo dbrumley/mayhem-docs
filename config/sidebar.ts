@@ -5,8 +5,18 @@ export var sidebar = [
       ja: 'ここから始める',
     },
     items: [
-      { label: 'Getting Started', slug: 'getting-started', link: '/getting-started' },
-      { label: 'Installation', slug: 'installation', link: '/installation' },
+      {
+        label: 'Getting Started', slug: 'getting-started', link: '/getting-started',
+        translations: {
+          ja: '始め方」'
+        }
+      },
+      {
+        label: 'Installation', slug: 'installation', link: '/installation',
+        translations: {
+          ja: 'インストール」'
+        }
+      },
       {
         label: 'Build a secure calculator app',
         link: 'tutorial/code-tutorial/',
@@ -22,6 +32,9 @@ export var sidebar = [
   {
     label: 'Tutorials',
     collapsed: true,
+    translations: {
+      ja: '「チュートリアル」'
+    },
     items: [
       {
         label: 'Analyze Source',
