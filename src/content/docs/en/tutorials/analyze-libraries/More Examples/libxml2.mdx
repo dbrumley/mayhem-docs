@@ -8,30 +8,27 @@ sidebar:
     text: "Easy"
     variant: 'tip'
 ---
-import Badge from '~/components/Badge.astro';
+
 import Checklist from '~/components/Checklist.astro';
 import Box from '~/components/tutorial/Box.astro';
 import Lede from '~/components/tutorial/Lede.astro';
+import PreCheck from '~/components/tutorial/PreCheck.astro';
 
+<PreCheck>
+- [Get and build the code](#get-and-build-the-code)
+- [Create and build harnesses](#create-and-build-harnesses)
+- [Test harnesses locally](#test-harnesses-locally)
+- [Integrate into the build system](#integrate-into-the-build-system)
+- [Create an initial test suite](#create-an-initial-test-suite)
+- [Dockerize everything](#dockerize-everything)
+- [Write Mayhemfile and run Mayhem](#write-mayhemfile-and-run-mayhem)
+- [Reproduce Mayhem findings locally](#reproduce-mayhem-findings-locally)
+- [Integrate into CI/CD](#integrate-into-cicd)
+- [Optimize performance](#optimize-performance)
+</PreCheck>
 
 <Lede> Let's harness libxml2 and find CVE-2015-8317! </Lede>
 
-<Box icon='check-list'>
-## Checklist
-<Checklist>
-- [ ] [Get and build the code](#get-and-build-the-code)
-- [ ] [Identify what functions to harness](#identify-what-functions-to-harness)
-- [ ] [Create and build harnesses](#create-and-build-harnesses)
-- [ ] [Create an initial test suite](#create-an-initial-test-suite)
-- [ ] [Dockerize everything](#dockerize-everything)
-- [ ] [Write a Mayhemfile](#write-a-mayhemfile)
-- [ ] [Run Mayhem analysis](#run-mayhem-analysis)
-- [ ] [Reproduce Mayhem findings locally](#reproduce-mayhem-findings-locally)
-- [ ] [Integrate your harnesses into CICD](#integrate-your-harnesses-into-cicd)
-- [ ] [Optimize performance](#optimize-performance)
-</Checklist>
-
-</Box>
 
 ## Get and build the code
 
@@ -50,21 +47,60 @@ git checkout 726f67e  # Code at this point contains CVE-2015-8317
 
 Second, build the code with AFL by setting the `CC` environment variable to
 `afl-clang-fast`, a wrapper for the clang compiler. We'll also be telling the
-wrapper to build [ASAN instrumentation](/en/concepts/security-policies). 
+wrapper to build [ASAN instrumentation](/en/concepts/security-policies), and to
+disable python. We're disabling python because the vulnerable version depends
+on some python 3.8 and before idiosyncrasies.
+
 
 ```bash
-CC=afl-clang-fast ./autogen.sh   # Use afl-clang-fast as the compiler
-AFL_USE_ASAN=1 make -j 4         # Build the code with AFL 
+CC=afl-clang-fast ./autogen.sh --without-python  # create and run ./configure
+AFL_USE_ASAN=1 make -j 4         # Build with ASAN using up to 4 cores
 ```
 
-## Identify what functions to harness
+:::tip[ASAN finds more bugs!]
+We are setting `AFL_USE_ASAN` as an environment variable to enable ASAN
+(Address Sanitizer), which Address finds memory corruption
+vulnerabilities like use-after-free, NULL pointer dereference, buffer overruns,
+and so on that may not result in an immediate crash.
+:::
+
+
+<details>
+<summary>I'm getting 'You must have autoconf installed to compile libxml.'</summary>
+Make sure you have autotools installed.  Try:
+```bash
+apt-get install -y autoconf automake libtool
+```
+and then re-run `autogen` and `make` as above. 
+</details>
+
+<details>
+<summary>I'm getting 'syntax error near unexpected token LZMA,liblzma,'</summary>
+Chasing down these sorts of errors is a real pain, but unfortunately part of any software analysis project!
+
+While the problem looks like `lzma` may be missing, it's actually because
+`pkg-config` is missing.  This is a bit more obvious if you read the
+`./configure` source code where the error occurs.  
+
+To fix, install `pkg-config`: 
+```bash
+apt-get install -y  pkg-config
+```
+and then re-run `autogen` and `make` as above. 
+
+</details>
+
+
+## Create and build harnesses 
 
 The core attack surface for any parser like libxml2 is the parsing logic
 itself. The libxml library exposes the parsing function via the  [`parser`
 API](https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html) 
 
+Try to identify which function to harness yourself.  (You can find the solution
+in the next section if you are stumped.)
 
-## Create and build harnesses 
+### Create the harness
 
 Harnessing is just like any other test activity:
 1. **Setup:** Call any routines needed to initialize the library. 
@@ -81,8 +117,9 @@ the next step harnessing the code.
 :::
 
 
+
 <details>
-<summary>Base solution</summary>
+<summary>Solution: harness</summary>
 
 The obvious candidate is `xmlReadFile`. This routine returns a base `xmlDocPtr`
 object, and no additional initialization is needed. Further, if we create this
@@ -114,13 +151,86 @@ int main(int argc, char **argv) {
 ```
 </details>
 
-## Create an initial test suite 
+### Build the harness
+After you've created the harness, you need to figure out how to build it. It's
+completely normal for this to take some time if you're unfamiliar with the
+build system. 
+
+Can you figure out how to build the harness?
+
+<details>
+<summary>Hint: You need to use -I and -L</summary>
+You should set the include path (-I) and library path (-L).  Here is a sketch:
+
+```bash
+afl-clang-fast  test_xmlReadFile.c <options> -I include -L .libs/ -o test_xmlReadFile -l <libs>
+```
+</details>
+
+<details>
+<summary>Build Solution</summary>
+
+Here is a working solution that instruments using 
+```bash
+# Working from inside the libxml2 directory
+AFL_USE_ASAN=1 afl-clang-fast  test_xmlReadFile.c -O2 -I include -L .libs/  -o test_xmlReadFile -lxml2
+
+# Alternatively, building with all clang instrumentation manually
+afl-clang-fast  test_xmlReadFile.c -O2 -fno-omit-frame-pointer \
+    -g -fsanitize=address,fuzzer -fsanitize-coverage=edge,indirect-calls,trace-cmp,trace-div,trace-gep \
+    -I include -L .libs/     -o test_xmlReadFile -lxml2
+```
+</details>
+
+
+## Test harnesses locally
+
+It's always good to try and run a local fuzzer before integrating into CICD and
+running Mayhem remotely. 
+
+Can you figure how to run the test harness with AFL++?
+
+<details>
+<solution>Solution</solution>
+```bash
+mkdir in out
+cp test/attrib.xml in
+afl-fuzz -i in -o out -- ./test_xmlReadFile @@
+```
+</details>
+
+## Integrate into the build system
+
+It's a good practice to integrate test harnesses into the code base directly so
+that it's maintained with every other test.
+
+libxml2 uses the autotools suite that drives the typical `./configure; make; make
+install` process.  To integrate our harnesses, we will need to change
+`Makefile.am` to include the harness. Can you figure out how? 
+
+<details>
+
+<summary>Solution: Integrating into Makefile.am</summary>
+
+```diff lang="c"
+- bin_PROGRAMS = xmllint xmlcatalog
++ bin_PROGRAMS = xmllint xmlcatalog test_xmlReadFile 
++test_xmlReadFile_SOURCES=test_xmlReadFile.c
++test_xmlReadFile_LDFLAGS = 
++test_xmlReadFile_DEPENDENCIES = $(DEPS)
++test_xmlReadFile_LDADD=  $(RDL_LIBS) $(LDADDS)
+```
+</details>
+
+
+
+## Create an initial test suite
 TBD
 
 ## Dockerize everything
 TBD
 
-## Write a Mayhemfile
+## Write Mayhemfile and run Mayhem
 TBD
 
 ## Run Mayhem analysis
@@ -129,7 +239,7 @@ TBD
 ## Reproduce Mayhem findings locally
 TBD
 
-## Integrate your harnesses into CICD
+## Integrate into CI/CD
 TBD
 
 ## Optimize performance
@@ -217,6 +327,23 @@ clang -g -O2 -fsanitize=fuzzer,address ./test_xmlReadFile_libfuzzer.c -I libxml2
 <summary>Add a dictionary</summary>
 tbd. 
 </details>
+
+<Box icon='check-list'>
+## Checklist
+<Checklist>
+- [ ] [Get and build the code](#get-and-build-the-code)
+- [ ] [Create and build harnesses](#create-and-build-harnesses)
+- [ ] [Test harnesses locally](#test-harnesses-locally)
+- [ ] [Integrate into the build system](#integrate-into-the-build-system)
+- [ ] [Create an initial test suite](#create-an-initial-test-suite)
+- [ ] [Dockerize everything](#dockerize-everything)
+- [ ] [Write Mayhemfile and run Mayhem](#write-mayhemfile-and-run-mayhem)
+- [ ] [Reproduce Mayhem findings locally](#reproduce-mayhem-findings-locally)
+- [ ] [Integrate into CI/CD](#integrate-into-cicd)
+- [ ] [Optimize performance](#optimize-performance)
+</Checklist>
+
+</Box>
 
 ## Credits
 

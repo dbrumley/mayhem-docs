@@ -1,0 +1,71 @@
+---
+title: Tips and Tricks
+order: 1
+description: Tips and tricks to save you time
+i18nReady: false
+
+
+---
+
+import { Image } from 'astro:assets';
+import yakImage from "~/assets/yak-shaving.png"
+
+<Image src={yakImage} alt="Yak shaving image." height="200px" />
+
+
+
+“Yak shaving” (or “shaving a yak”) refers to a task, that leads you to another
+task, that leads you to another, and so on. The term was coined by Carlin
+Vieri, an MIT PhD, in the 90s.  
+
+These tips and tricks are designed to help you save time yak shaving. 
+
+## Create a development docker image and use it
+
+Creating a docker image that contains your commonly used tools can save you
+time. Once you define the image, you can reuse it multiple times on multiple
+projects.
+
+Here is a good starter:
+
+```Dockerfile title="Dockerfile"
+FROM debian:stable-slim
+RUN apt-get update && apt-get install -y build-essential \
+  gdb vim less libc6-dbg valgrind afl++ libfuzzer-16-dev file curl \
+  python-is-python3 python3-pip python3.11-venv \
+  meson cmake ninja-build pkg-config autoconf automake libtool
+RUN bash -c "$(curl -fsSL https://gef.blah.cat/sh)"
+RUN echo "export LC_CTYPE=C.UTF-8" >> /etc/bash.bashrc
+WORKDIR /build
+CMD ["/bin/bash"]
+```
+
+### Building the image
+Here is how you might build it, substituting `mayhem` for your own [DockerHub](https://hub.docker.com/)
+username. 
+```bash
+# Build for x86/x64, which is technically called amd64. 
+docker build --platform=Linux/amd64 -t mayhem/dev:amd64 . # Build for x86/x64/amd64 
+docker push mayhem/dev:amd64   
+
+# Optional: build for ARM, such as on an M1 mac
+docker build --platform=Linux/aarch64 -t mayhem/dev:arm . 
+docker push mayhem/dev:arm
+
+# Tag your default architecture as latest
+docker tag mayhem/dev:amd64 mayhem/dev:latest
+docker push mayhem/dev:latest
+```
+
+### Using the image
+
+Suppose you have checked out your project in the current directory. You can
+mount this within the docker container to get access to your dev tools, while
+also ensuring all changes are reflected locally.
+
+To do so, run:
+```bash
+# -v `pwd`:/build mounts the current directory into /build in the container
+# -ti runs an interaction shell
+docker run -v `pwd`:/build  -ti mayhem/dev bash
+```
