@@ -1,0 +1,73 @@
+---
+type: tutorial
+order: 2
+unitTitle: Setup the code base
+title: 'Setup the code base'
+description: >-
+  Tutorial: Analyzing libraries
+
+  Install your development environment, and build the initial library.
+i18nReady: true
+sidebar: 
+  label: Setup the code base
+  order: 3
+---
+
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro'
+import PreCheck from '~/components/tutorial/PreCheck.astro';
+
+<PreCheck>
+ - Fork the initial tinyxml2 GitHub repository.
+ - Clone your copy to your local machine.
+</PreCheck>
+
+<Lede>Let's get started improving tinyxml2-2.0.1!</Lede>
+
+Now that you know what we're going to improve and have all the dependencies
+installed, it's time to make sure you can build the software. 
+
+:::tip[Always check you can compile first]
+The first thing  you should always do when adding any new analysis is make sure
+you know how to build the software. It can take some time when working
+with a new code base, so be patient with yourself.  
+:::
+
+## Fork the initial repository
+
+As you write code, you will be periodically committing your changes to
+GitHub, and ultimately setting up your CI/CD pipeline to automatically run a
+security analysis pipeline. A fork in Git is simply a copy of an existing
+repository in which your changes are your own and disconnected from the
+original developers.  
+
+Your first step is to fork our [sample
+repository](https://github.com/ForAllSecure/analyze-libraries-tutorial) on
+GitHub.  You should be able to see your fork at
+**https://github.com/USERNAME/analyze-libraries-tutorial** (using your own
+USERNAME) when complete. 
+
+## Clone your repository
+
+Once you've created a fork, you need to download it to your local machine.
+This is called "cloning" the repository. To do so, run:
+
+```bash
+# Clone the repository. Make sure you use your own USERNAME
+git@github.com:<USERNAME>/analyze-libraries-tutorial.git 
+
+# Enter the code directory
+cd analyze-libraries-tutorial 
+```
+
+
+<Box icon="check-list">
+## Checklist
+
+<Checklist>
+- [ ] I've successfully built the code
+- [ ] I've ran `./test` successfully
+</Checklist>
+</Box>
+

@@ -8,6 +8,10 @@ description: >-
 
   Prepare your development environment, and build the initial library.
 i18nReady: true
+sidebar: 
+  label: Setup your system
+  order: 2
+
 ---
 
 import Checklist from '~/components/Checklist.astro';
@@ -50,6 +54,28 @@ On Debian and Ubuntu systems, you can install these requirements with:
 ```bash
 sudo apt-get install -y build-essential clang cmake
 ```
+
+### Debugger
+
+A debugger will help you identify the root cause of bugs and vulnerabilities.
+On Debian and Ubuntu systems, you can install gdb with:
+```bash
+sudo apt-get install -y gdb
+```
+
+:::tip[gdb pro tip!]
+You can start `gdb` on a command line, including arguments, right from the
+shell. Many people do not know how to start gdb on an application that takes
+arguments. Suppose you run the program with `./test --foo blah`:
+```bash
+# Efficient!
+gdb --args ./test --foo blah
+
+# Inefficient. 
+gdb ./test
+set args --foo blah
+```
+:::
 
 ### Code Editor
 

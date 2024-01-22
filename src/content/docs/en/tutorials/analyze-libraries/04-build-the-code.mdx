@@ -1,13 +1,16 @@
 ---
 type: tutorial
 order: 2
-unitTitle: Setup the code base
-title: 'Setup the code base'
+unitTitle: Build the code
+title: 'Build the code'
 description: >-
   Tutorial: Analyzing libraries
 
-  Install your development environment, and build the initial library.
+  Build the initial library.
 i18nReady: true
+sidebar: 
+  label: Build the code
+  order: 4
 ---
 
 import Checklist from '~/components/Checklist.astro';
@@ -16,59 +19,27 @@ import Lede from '~/components/tutorial/Lede.astro'
 import PreCheck from '~/components/tutorial/PreCheck.astro';
 
 <PreCheck>
- - Fork the initial tinyxml2 GitHub repository.
- - Clone your copy to your local machine.
  - Build the code.
  - Run the included test driver. 
 </PreCheck>
 
-<Lede>Let's get started improving tinyxml2-2.0.1!</Lede>
 
-Now that you know what we're going to improve and have all the dependencies
-installed, it's time to make sure you can build the software. 
 
-:::tip[Always check you can compile first]
-The first thing  you should always do when adding any new analysis is make sure
-you know how to build the software. It can take some time when working
-with a new code base, so be patient with yourself.  
-:::
-
-## Fork the initial repository
-
-As you write code, you will be periodically committing your changes to
-GitHub, and ultimately setting up your CI/CD pipeline to automatically run a
-security analysis pipeline. A fork in Git is simply a copy of an existing
-repository in which your changes are your own and disconnected from the
-original developers.  
-
-Your first step is to fork our [sample
-repository](https://github.com/ForAllSecure/analyze-libraries-tutorial) on
-GitHub.  You should be able to see your fork at
-**https://github.com/USERNAME/analyze-libraries-tutorial** (using your own
-USERNAME) when complete. 
-
-## Clone your repository
-
-Once you've created a fork, you need to download it to your local machine.
-This is called "cloning" the repository. To do so, run:
-
-```bash
-# Clone the repository. Make sure you use your own USERNAME
-git@github.com:<USERNAME>/analyze-libraries-tutorial.git 
-
-# Enter the code directory
-cd analyze-libraries-tutorial 
-```
+From now on we will assume you are in the tutorial code directory
+`analyze-libraries-tutorial`.  
 
 ## Build the code
 
-From now on we will assume you are in the tutorial code directory
-`analyze-libraries-tutorial`.  Our first major step is to make sure you can
+Our first major step is to make sure you can
 build the code.  
 
 ```bash
 cmake -B build   # Create a build directory with source in the current directory
-make -C build         # Enter the build directory and run make
+
+make -C build    # Use make specifying the build directory
+
+cmake --build build    # Alternatively, build with cmake
+
 ```
 
 <details>
@@ -112,7 +83,7 @@ You can create a `compile_commands.json` file
 with: 
 ```bash
 cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 # 
-make -C build 
+cmake --build build   
 ```
 `compile_commands.json` can be read by downstream tools like [CodeCompass](https://github.com/Ericsson/CodeCompass). 
 </details>
@@ -146,8 +117,6 @@ when retrofitting application security into a legacy or existing project.
 ## Checklist
 
 <Checklist>
-- [ ] I've created my own fork
-- [ ] I've cloned the fork to my local machine
 - [ ] I've successfully built the code
 - [ ] I've ran `./test` successfully
 </Checklist>

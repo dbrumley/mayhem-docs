@@ -1,0 +1,190 @@
+---
+type: tutorial
+order: 2
+unitTitle: Build the code
+title: 'Build the code'
+description: >-
+  Tutorial: Analyzing libraries
+
+  Write a harness.
+i18nReady: true
+sidebar: 
+  label: Write a harness
+  order: 5
+---
+
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro'
+import PreCheck from '~/components/tutorial/PreCheck.astro';
+
+<PreCheck>
+ - Write a new test harness.
+ - Add the new test harness to the build.
+ - Run the new test harness. 
+</PreCheck>
+
+So far you've been working with the existing code base. In this step we'll a
+new test harness.
+
+## What is a test harness?
+
+:::warning [Nomenclature]
+There are different definitions and terms for essentially the same thing.
+In dynamic analysis literature the process of building a new test, including
+writing a test driver, writing mocks, and so on is called **harnessing** and the
+resulting code a **harness**.  
+
+In software testing, "harnessing" is the same process as writing a new test. The International Software Testing Qualifications Board
+([ISTQB](https://www.istqb.org/))  would call the **harness* a **test**.
+
+TL;DR - A **test** in software testing is the same as a **harness* in dynamic
+analysis.
+:::
+
+In testing you check a single input for a single output, e.g.,:
+```c
+assert(factorial(3) ==6); 
+```
+
+Mayhem, like most dynamic analysis, store inputs in a file rather than embedded
+directly in the code.  In order to test a new function, you will need to:
+1. Read an input from a file
+2. Call any library setup
+3. Call the function under test
+4. Perform any needed library teardown.
+
+## What should you harness?
+
+When harnessing a library, the first thing to target is the libraries public
+API. These are functions a user can directly call, and testing and security
+checks help ensure that downstream users can use the published API without
+problem.
+
+::: tip[How much to harness]
+The best-tested libraries have a harness for each public API member a
+user could call.  
+:::
+
+Right now the `xmltest.cpp` file only tests `LoadFile`. 
+```cpp "doc->LoadFile( argv[1] );"
+// xmltest.cpp
+	if ( argc > 1 ) {
+		XMLDocument* doc = new XMLDocument();
+		clock_t startTime = clock();
+		doc->LoadFile( argv[1] );
+		clock_t loadTime = clock();
+		int errorID = doc->ErrorID();
+		delete doc; doc = 0;
+		clock_t deleteTime = clock();
+
+		printf( "Test file '%s' loaded. ErrorID=%d\n", argv[1], errorID );
+		if ( !errorID ) {
+			printf( "Load time=%u\n",   (unsigned)(loadTime - startTime) );
+			printf( "Delete time=%u\n", (unsigned)(deleteTime - loadTime) );
+			printf( "Total time=%u\n",  (unsigned)(deleteTime - startTime) );
+		}
+		exit(0);
+	}
+```
+
+## Writing a new test harness
+
+Write a new test harness for `NewText`.
+
+Here is a template:
+```cpp
+// test_newtext.cpp
+#include "tinyxml2.h"
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+
+using namespace tinyxml2;
+
+int main( int argc, const char ** argv )
+{
+  char buf[10240];
+
+  int rc = read(0, &buf, sizeof(buf));
+  // Add code to call NewText
+
+  exit(0);
+} 
+
+```
+
+<details>
+<summary>Solution</summary>
+
+```diff lang="cpp"
+// test_newtext.cpp
+#include "tinyxml2.h"
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+
+using namespace tinyxml2;
+
+int main( int argc, const char ** argv )
+{
+  char buf[10240];
+
+  int rc = read(0, &buf, sizeof(buf));
++  XMLDocument doc;
++  XMLElement* textNode = doc.NewElement("text");
++  XMLText* versionText = doc.NewText(buf);
++
++  textNode->InsertEndChild(versionText);
++  doc.InsertEndChild(textNode);
++
++  XMLPrinter printer;
++  doc.Print();
+  
+  exit(0);
+} 
+```
+</details>
+
+## Adding the harness to the build
+
+The next step is to integrate the harness into the overall build. Can you change the build to include building the harness?
+
+<details>
+<summary>Solution</summary>
+
+```diff lang="cmake"
+// CMakeLists.txt
+add_executable(test xmltest.cpp)
+add_dependencies(test tinyxml2)
+add_dependencies(test ${TARGET_DATA_COPY})
+target_link_libraries(test tinyxml2)
+
++ add_executable(test_newtext test_newtext.cpp)
++ add_dependencies(test_newtext tinyxml2)
++ target_link_libraries(test_newtext tinyxml2)
+```
+
+You then need to rebuild with the new file: 
+```bash
+cmake --build build   # reconfigure and rebuild
+```
+</details>
+
+
+
+
+## Running the new harness
+
+TBD.
+
+
+<Box icon="check-list">
+## Checklist
+
+<Checklist>
+- [ ] I've successfully built the code
+- [ ] I've ran `./test` successfully
+</Checklist>
+</Box>
+
