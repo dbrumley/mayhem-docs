@@ -43,7 +43,7 @@ export var sidebar = [
       },
       {
         label: 'Analyze Libraries',
-        autogenerate: { directory: 'tutorials/analyze-libraries/' },
+        autogenerate: { directory: 'tutorials/analyze-libraries' },
         collapsed: true,
       },
       { label: 'Analyze Binaries', link: 'tutorials/analyze-binary', collapsed: true },

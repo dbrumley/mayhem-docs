@@ -1,0 +1,226 @@
+---
+type: tutorial
+title: libxml2 and CVE-2015-8317
+description: libxml2 and CVE-2015-8317
+i18nReady: false
+sidebar: 
+  badge: 
+    text: "Easy"
+    variant: 'tip'
+---
+import Badge from '~/components/Badge.astro';
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro';
+
+
+<Lede> Let's harness libxml2 and find CVE-2015-8317! </Lede>
+
+<Box icon='check-list'>
+## Checklist
+<Checklist>
+- [ ] [Get and build the code](#get-and-build-the-code)
+- [ ] [Identify what functions to harness](#identify-what-functions-to-harness)
+- [ ] [Create and build harnesses](#create-and-build-harnesses)
+- [ ] [Create an initial test suite](#create-an-initial-test-suite)
+- [ ] [Dockerize everything](#dockerize-everything)
+- [ ] [Write a Mayhemfile](#write-a-mayhemfile)
+- [ ] [Run Mayhem analysis](#run-mayhem-analysis)
+- [ ] [Reproduce Mayhem findings locally](#reproduce-mayhem-findings-locally)
+- [ ] [Integrate your harnesses into CICD](#integrate-your-harnesses-into-cicd)
+- [ ] [Optimize performance](#optimize-performance)
+</Checklist>
+
+</Box>
+
+## Get and build the code
+
+In this example, you will reproduce CVE-2015-8317.  We'll need to check out the
+version of the code that has this vulnerability, and then build it. 
+
+We're going to build with AFL so that we can test our harnesses locally. After
+we run them locally, we'll integrate everything into Mayhem and CI/CD.
+
+First, clone the repository and check out the correct version:
+```bash
+git clone git@github.com:GNOME/libxml2.git
+cd libxml2            
+git checkout 726f67e  # Code at this point contains CVE-2015-8317
+```
+
+Second, build the code with AFL by setting the `CC` environment variable to
+`afl-clang-fast`, a wrapper for the clang compiler. We'll also be telling the
+wrapper to build [ASAN instrumentation](/en/concepts/sanitizers). 
+
+```bash
+CC=afl-clang-fast ./autogen.sh   # Use afl-clang-fast as the compiler
+AFL_USE_ASAN=1 make -j 4         # Build the code with AFL 
+```
+
+## Identify what functions to harness
+
+The core attack surface for any parser like libxml2 is the parsing logic
+itself. The libxml library exposes the parsing function via the  [`parser`
+API](https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html) 
+
+
+## Create and build harnesses 
+
+Harnessing is just like any other test activity:
+1. **Setup:** Call any routines needed to initialize the library. 
+2. **Write test code:** Call the function you'd like to test.
+3. **Teardown:** Call any needed teardown code.
+
+Have you identified a function to harness in libxml2? Do you need to initialize
+anything before calling that code?  What about teardown?
+
+:::tip[Reading code bases]
+As soon as you identify functions that you'd like to harness, start looking
+through the code base for how those functions are used. That will help you in
+the next step harnessing the code. 
+:::
+
+
+<details>
+<summary>Base solution</summary>
+
+The obvious candidate is `xmlReadFile`. This routine returns a base `xmlDocPtr`
+object, and no additional initialization is needed. Further, if we create this
+as a stack variable the object will be destroyed when our harness returns.
+
+Here is a minimal harness:
+
+```c title="test_xmlReadFile"
+#include "libxml/parser.h"
+#include "libxml/tree.h"
+
+
+int main(int argc, char **argv) {
+    if (argc != 2){
+        return(1);
+    }
+
+    xmlInitParser();
+    while (__AFL_LOOP(1000)) {
+        xmlDocPtr doc = xmlReadFile(argv[1], NULL, 0);
+        if (doc != NULL) {
+            xmlFreeDoc(doc);
+        }
+    }
+    xmlCleanupParser();
+
+    return(0);
+}
+```
+</details>
+
+## Create an initial test suite 
+TBD
+
+## Dockerize everything
+TBD
+
+## Write a Mayhemfile
+TBD
+
+## Run Mayhem analysis
+TBD
+
+## Reproduce Mayhem findings locally
+TBD
+
+## Integrate your harnesses into CI/CD
+TBD
+
+## Optimize performance
+
+We can improve the performance of our harness in two ways:
+1. Use AFL persistent mode. This should give you about 2x performance
+   improvement. 
+2. Use libfuzzer, an in-memory fuzzer. Libraries are great candidates for
+   in-memory fuzzers.
+
+Try to work out both solutions by yourself first. 
+
+<details>
+<summary>Solution: AFL Persistent mode</summary>
+
+```c title="test_xmlReadFile_persistent.c"
+#include "libxml/parser.h"
+#include "libxml/tree.h"
+#include <unistd.h>
+
+__AFL_FUZZ_INIT();
+
+int main(int argc, char **argv) {
+    #ifdef __AFL_HAVE_MANUAL_CONTROL
+        __AFL_INIT();
+    #endif
+    unsigned char *buf = __AFL_FUZZ_TESTCASE_BUF;  // must be after __AFL_INIT
+
+    xmlInitParser();
+    while (__AFL_LOOP(1000)) {
+        int len = __AFL_FUZZ_TESTCASE_LEN;
+        xmlDocPtr doc = xmlReadMemory((char *)buf, len, "https://mykter.com", NULL, 0);
+        if (doc != NULL) {
+            xmlFreeDoc(doc);
+        }
+    }
+    xmlCleanupParser();
+
+    return(0);
+}
+```
+
+</details>
+
+<details>
+<summary>Solution: libfuzzer</summary>
+
+First, you need to compile libxml2 for libfuzzer by setting the `CC` and
+`CFLAGS`. Since this is a library, we want to compile with `fuzzer-no-link`
+because there is no `main` function:
+
+```bash
+CC=clang CFLAGS=-fsanitize=fuzzer-no-link,address ./autogen.sh
+make -j4
+```
+
+Second, create your harness:
+
+```c title="test_xmlReadFile_libfuzzer.c"
+#include <stdint.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+
+void quietError(void *ctx, const char *msg, ...) {}
+
+int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
+{
+    xmlSetGenericErrorFunc(NULL, &quietError); // suppress all error output
+    xmlDocPtr doc = xmlReadMemory((const char *)Data, Size, "noname.xml", NULL, 0);
+    if (doc != NULL)
+    {
+        xmlFreeDoc(doc);
+    }
+}
+```
+
+Now compile your harness:
+```bash
+clang -g -O2 -fsanitize=fuzzer,address ./test_xmlReadFile_libfuzzer.c -I libxml2/include/ libxml2/.libs/libxml2.a -lz -lm -o test_xmlReadFile_libfuzzer
+```
+
+</details>
+
+<details>
+<summary>Add a dictionary</summary>
+tbd. 
+</details>
+
+## Credits
+
+This example comes from the wonderful [AFL training
+tutorial](https://github.com/mykter).  
+
+**Have your own examples?** We'd love for you to submit it as a PR!
