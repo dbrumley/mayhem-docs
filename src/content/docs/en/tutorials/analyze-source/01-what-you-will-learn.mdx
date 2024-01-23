@@ -1,0 +1,198 @@
+---
+type: tutorial
+title: What you will learn
+description: >-
+  Tutorial: Analyzing libraries
+
+  What you will learn 
+i18nReady: false
+sidebar: 
+  label: What you will learn
+  order: 1
+  
+---
+
+import Checklist from '~/components/Checklist.astro';
+import Box from '~/components/tutorial/Box.astro';
+import Lede from '~/components/tutorial/Lede.astro';
+import MultipleChoice from '~/components/tutorial/MultipleChoice.astro';
+import Option from '~/components/tutorial/Option.astro';
+
+
+<Lede> If you have a basic understanding with **C** and the **UNIX CLI**, you are
+ready to go. </Lede> 
+
+You will also need a [GitHub](https://github.com) (or similar) account for
+integrating your project into CICD. 
+
+You will learn how to systematically add dynamic analysis and fuzzing to
+your code in the following bite-sized chunks: 
+1. Set up your system
+2. Set up the code base
+3. Build the library code
+4. Create and build harnesses 
+5. Create an initial test suite (aka corpus)
+6. Dockerize everything
+7. Run with Mayhem
+8. Reproduce Mayhem findings on your local machine
+9. Integrate the library and your harness into CI/CD
+10. Optimize performance
+
+## Concepts
+
+People who understand the underlying concepts report the easiest ability to
+adopt dynamic analysis like Mayhem.  Here is a quick tutorial.
+
+
+### What is a harness? 
+
+A harness is simple a test driver that runs the library in the intended way. Mayhem analysis, fuzzing, and other dynamic analysis all require you write a
+test harness. Test harnesses have three steps:
+1. **Setup:** Call any needed library initialization code.
+2. **Test:** Calls the functions you want to test
+3. **Teardown:** Free any resources set up during testing.
+
+In the dynamic analysis community the above steps are called "harnessing".  Harnessing, just like testing, enables dynamic analysis to focus on specific
+code of interest.   
+
+### Why are there zero false positives? 
+
+You may have heard about false positives when running analysis. A false
+positive occurs when the analysis says something about the program under test
+that is untrue. False positives are a constant and unavoidable problem in
+static analysis. 
+
+In dynamic analysis, the program under test is the running harness. Mayhem
+always produces a *test case* that demonstrates defects in the running harness.
+You can think of the test case as a Proof of Vulnerability (POV). 
+
+
+> Garbage in, garbage out.
+
+Of course if your test framework is garbage, the results are also garbage. The zero false positive guarantee works just the same as with unit tests.  Each
+time you run a unit test you are checking whether the code as written behaves
+as intended.  If the test fails, you don't say the test has a false positive;
+that wouldn't make sense. Instead, it's garbage in, garbage out.  So it's
+important to make sure your test harnesses are correctly running the code, just
+like you would with a unit test.
+
+
+### How does Mayhem differ from unit testing? 
+
+Mayhem and the underlying technologies such as fuzzing and symbolic execution
+are a generalization of testing.  A typical unit test takes exactly one input
+and tests for one output.  For example, if we have the factorial function we might write three unit tests
+by hand: 
+```c
+EXPECT_EQ(Factorial(1), 1);
+EXPECT_EQ(Factorial(2), 2);
+EXPECT_EQ(Factorial(3), 6);
+```
+
+Mayhem generalizes unit testing by checking
+[program properties](https://en.wikipedia.org/wiki/Property_testing).
+Under-the-hood, Mayhem is running fuzzing, symbolic execution, dynamic bug
+triage, and a host of another analysis together to provide you the best
+security testing experience.  
+
+Without any configuration, Mayhem checks for runtime errors that raise signals, such as
+divide by zero and `assert` failures. But it doesn't stop there. 
+
+
+### What sort of security properties can Mayhem check?
+
+One of the cool things about dynamic analysis is you can inline your own
+security property in the same language the program is written in. In fact,
+developers do this every day with `assert` statements. 
+
+Technically, you can write and check code for any  **enforceable security
+property** with Mayhem.  This set of properties is very general, and is [very precisely
+defined](https://www.cs.cornell.edu/fbs/publications/EnfSecPols.pdf). Just
+about any security analysis you want -- from business logic to injection
+attacks -- is an enforceable security property. 
+
+### Is fuzzing random?
+
+This is a common misconception, and to be fair, a large number of experts
+informally will make this mistake.  A more correct statement is that fuzzing is
+a randomized algorithm. However, many intelligent algorithms are randomized
+while not being "dumb random". 
+
+The original paper that coined the term "fuzzing" used purely random inputs. In
+fact, one could argue it was simply randomized testing (which was well known at the time)
+rebranded. 
+
+However, since then significant advances have been made. Modern fuzzers like
+AFL++ and libfuzzer use advanced feedback-driven algorithms to generate new
+inputs. For example, AFL++ and libfuzzer use features such as `cmp`
+instructions to more intelligently check programs. 
+
+
+### Does type safety make dynamic analysis unnecessary?
+
+No!  The purpose of fuzzing in type-safe languages is to prevent runtime
+exceptions from vulnerabillities.  In fact, type-safe languages like Go and Rust have adopted fuzzing as a
+key part of how they do security.  
+
+Why?  Type safety is only one part of
+writing a safe program.  At a high level, type safety says that if the program
+is well-typed, then each step of execution is safe **or the program will
+terminate with an exception**.  We call this preservation (a step in a
+well-typed program is well-typed), and progress (a well-typed program takes a
+step, or is finished if there is no such step). In the world of security, this means
+vulnerabilities still exist, but the type system prevents certain ways of
+exploiting vulnerabilities like control flow hijack.
+
+Fuzzing can root out those bugs that result in runtime errors proactively. 
+
+### Where is a good place to start when I'm analyzing 3rd party code?
+
+Existing unit tests and sample applications are the best place to start.  In
+fact, many google tests can be turned into harnesses with very little
+modification.
+
+## Check your knowledge
+
+1. Type safety prevents all vulnerabilities.
+ <MultipleChoice>
+   <Option>True</Option>
+   <Option isCorrect>False</Option>
+ </MultipleChoice>
+
+ <details>
+ <summary>Explanation</summary>
+ Type safety does not mean that the code is bug or vulnerability free. For example, the application may still have errors that cause runtime problems.Box
+ </details>
+
+2. Harnessing requires the same steps as writing a unit test.
+<MultipleChoice>
+   <Option isCorrect>True</Option>
+   <Option>False</Option>
+ </MultipleChoice>
+
+ <details>
+ <summary>Explanation</summary>
+ Harnessing is just like writing a unit test. The only difference is that instead of asserting a single input has a single output, you check a program property.
+ </details>
+
+3. Mayhem is a fuzzer.
+<MultipleChoice>
+   <Option>True</Option>
+   <Option isCorrect>False</Option>
+ </MultipleChoice>
+
+ <details>
+ <summary>Explanation</summary>
+It is correct to say Mayhem has a fuzzer in the Box. However, Mayhem performs a suite of additional dynamic analysis, such as backtrace analysis, triage, and symbolic execution.
+
+ </details>
+
+
+<Box icon="check-list">
+## Checklist for moving on
+
+<Checklist>
+- [ ] I'm ready to build this thing!
+</Checklist>
+</Box>
+

@@ -41,11 +41,6 @@ export var sidebar = [
         autogenerate: { directory: 'tutorials/analyze-source' },
         collapsed: true,
       },
-      {
-        label: 'Analyze Libraries',
-        autogenerate: { directory: 'tutorials/analyze-libraries' },
-        collapsed: true,
-      },
       { label: 'Analyze Binaries', link: 'tutorials/analyze-binaries', collapsed: true },
       { label: 'Tips and Tricks', link: 'tutorials/tips-and-tricks' },
     ],
