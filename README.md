@@ -15,7 +15,14 @@ You can then see the documentation at `https://localhost:4321`.
 *Format code*:  `npm run format`
 *Build production code*: `npm run build`, which will output the code in `dist`.
 
+## 👨‍💻 Development
 
+The documentation is written in [Astro](https://astro.build/) and builds off
+the [starlight](https://starlight.astro.build/) template.  Please refer to that
+documentation.
+
+Astro has a [Visual Code](https://docs.astro.build/en/editor-setup/) plugin,
+and we recommend you install that. 
 
 
 ## 🚀 Project Structure

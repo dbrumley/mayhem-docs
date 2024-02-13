@@ -1,0 +1,54 @@
+---
+title: Upgrading
+description: tbd
+sidebar: 
+  order: 2
+---
+
+Subscribers can download the latest version from
+[https://updates.mayhem.security](https://updates.mayhem.security) using their
+customer login credentials. 
+
+You upgrade Mayhem to the latest version with four steps:
+1. Downloading and unpacking the latest version.
+2. Updating the Kubernetes registry images
+3. Updating Kubernetes to use the new versions new helm chart 
+4. (Optional) Removed the previous Mayhem version code
+
+While we make every effort to ensure upgrades do not destroy data, best
+practice is to perform a backup before upgrading Mayhem.
+
+:::note
+
+If you are upgrading for the first time, you will need to make a copy of two
+configuration files:
+```bash
+cp /etc/mayhem/mchart/settings.yaml /etc/mayhem/settings.yaml
+cp /etc/mayhem/mchart/archetype.yaml /etc/mayhem/archetype.yaml
+```
+If you already have `/etc/mayhem/settings.yaml` and
+`/etc/mayhem/archetype.yaml`, you need not perform this step.
+
+:::
+
+
+
+```bash
+# Step 1: Unpack Mayhem
+tar zxf mayhem-x.y.z.tgz
+cd mayhem-x.y.z
+
+# Step 2: Update the Mayhem docker images
+docker load -i mayhem-code-registry-x.y.z.tar
+docker run -d -p 5001:5000 --restart always --name mayhem-code-registry-container mayhem-code-registry
+
+# Step 3: Update Kubernetes to use the new version of the Mayhem helm chart
+helm update --install mayhem mchart-X.X.XX.tgz -f settings.yaml -f archetype.yaml
+
+# Step 4: (Optional) Remove the previous Mayhem version code
+docker rm -f mayhem-code-registry-container
+docker rmi -f mayhem-code-registry
+```
+
+
+

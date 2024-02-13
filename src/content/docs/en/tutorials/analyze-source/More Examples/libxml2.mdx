@@ -138,11 +138,9 @@ int main(int argc, char **argv) {
     }
 
     xmlInitParser();
-    while (__AFL_LOOP(1000)) {
-        xmlDocPtr doc = xmlReadFile(argv[1], NULL, 0);
-        if (doc != NULL) {
-            xmlFreeDoc(doc);
-        }
+    xmlDocPtr doc = xmlReadFile(argv[1], NULL, 0);
+    if (doc != NULL) {
+        xmlFreeDoc(doc);
     }
     xmlCleanupParser();
 
