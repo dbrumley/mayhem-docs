@@ -5,7 +5,14 @@ sidebar:
   order: 3
 
 ---
-How to backup mayhem data.
+
+Mayhem uses a docker registry, minio, and a postgres database to persist data.  A full backup includes backing up each one of these services.  While you can do backups on a live, running system, best practice is to shut down the database while backups are performed. 
+
+To shut down mayhem, run `/bin/mayhem-stop`. Similarly `/bin/mayhem-start` starts mayhem. 
+
+## Backing up Mayhem Data
+
+Here is a shell script that shows you how to backup each service:
 
 ```bash
 #!/bin/bash
@@ -47,4 +54,56 @@ kubectl cp ${MINIO_POD}:/export minio-export
 ####################################
 REGISTRY_POD=$(kubectl get pod -l=app=internal-docker-registry | tail -1 | cut -d" " -f1)
 kubectl cp ${REGISTRY_POD}:/var/lib/registry internal-docker-registry
+```
+## Restoring data from a backup
+
+Use this shell script to restore data from backup:
+
+```bash
+#!/bin/bash
+
+set -euxo pipefail
+
+if [[ $# != 1 ]]; then
+	echo "ERROR: No project provided, please provide gcp project name (i.e. customer-000001)."
+	echo "usage: restore.sh <project>"
+	exit 1
+fi
+
+project=$1
+
+# Set kccc
+gcloud container clusters get-credentials mayhem --zone us-west1-a --project $project
+
+# Just in case!
+kubectl config current-context
+
+# Kill anything we spawn in the background
+trap "exit" INT TERM ERR
+trap "kill 0" EXIT
+
+####################################
+# postgres
+####################################
+
+# Restore -- requires that the tower database is removed first (-c)
+cat tower.pg_dump.tgz \
+	| HTTPS_PROXY=localhost:8888 kubectl exec --stdin mchart-postgresql-0 \
+		-- bash -c 'gzip -d | pg_restore -U postgres -d tower -c -Ft'
+
+####################################
+# minio
+####################################
+MINIO_POD=$(HTTPS_PROXY=localhost:8888 kubectl get pods | grep minio | cut -d" " -f1)
+tar cz minio-export \
+	| HTTPS_PROXY=localhost:8888 kubectl exec --stdin ${MINIO_POD} \
+		-- sh -c 'mkdir -p /export && tar xz --strip-components=1 -C /export'
+
+####################################
+# docker-registry
+####################################
+REGISTRY_POD=$(HTTPS_PROXY=localhost:8888 kubectl get pod -l=app=internal-docker-registry | tail -1 | cut -d" " -f1)
+tar cz internal-docker-registry \
+	| HTTPS_PROXY=localhost:8888 kubectl exec --stdin ${REGISTRY_POD} \
+		-- sh -c 'mkdir -p /var/lib/registry && tar xz --strip-components=1 -C /var/lib/registry'
 ```
