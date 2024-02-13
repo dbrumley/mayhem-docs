@@ -5,4 +5,46 @@ sidebar:
   order: 3
 
 ---
-How to backup mayhem data
+How to backup mayhem data.
+
+```bash
+#!/bin/bash
+
+set -euxo pipefail
+
+if [[ $# != 1 ]]; then
+	echo "ERROR: No cluster provided, please provide gcp cluster name (i.e. customer-forallsecure-com)."
+	echo "usage: backup.sh <cluster>"
+	exit 1
+fi
+
+cluster=$1
+
+# Set kccc
+gcloud container clusters get-credentials $cluster --zone us-west1-a --project forallsecure-1
+
+# Just in case!
+kubectl config current-context
+
+# Kill anything we spawn in the background
+trap "exit" INT TERM ERR
+trap "kill 0" EXIT
+
+####################################
+# postgres
+####################################
+(kubectl exec mchart-postgresql-0 -- bash -c 'pg_dump -d tower -U postgres -Ft | gzip -9') \
+	> tower.pg_dump.tgz
+
+####################################
+# minio
+####################################
+MINIO_POD=$(kubectl get pods | grep minio | cut -d" " -f1)
+kubectl cp ${MINIO_POD}:/export minio-export
+
+####################################
+# docker-registry
+####################################
+REGISTRY_POD=$(kubectl get pod -l=app=internal-docker-registry | tail -1 | cut -d" " -f1)
+kubectl cp ${REGISTRY_POD}:/var/lib/registry internal-docker-registry
+```
